@@ -528,9 +528,9 @@ function renderFinancing() {
 }
 
 // ===== WEB3FORMS API KEY =====
-// Get your free key at https://web3forms.com — enter automation@selwaytool.com
+// Get your free key at https://web3forms.com — enter jonnymadden21@cloud.com
 // Replace the key below with your actual key
-const WEB3FORMS_KEY = 'YOUR_ACCESS_KEY_HERE';
+const WEB3FORMS_KEY = '8d009d47-79bd-4615-be0b-bcc34bb66a50';
 
 // ===== QUOTE REQUEST =====
 function handleQuoteRequest() {
