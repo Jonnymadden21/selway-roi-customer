@@ -527,6 +527,11 @@ function renderFinancing() {
   updateFin();
 }
 
+// ===== WEB3FORMS API KEY =====
+// Get your free key at https://web3forms.com — enter automation@selwaytool.com
+// Replace the key below with your actual key
+const WEB3FORMS_KEY = 'YOUR_ACCESS_KEY_HERE';
+
 // ===== QUOTE REQUEST =====
 function handleQuoteRequest() {
   const name = document.getElementById('custName').value.trim();
@@ -543,45 +548,218 @@ function handleQuoteRequest() {
   const t = state.selectedTrinity;
   const m = state.selectedMachine;
 
-  const subject = encodeURIComponent(`ROI Proposal Request — ${company || name}`);
-  const body = encodeURIComponent(
-`New ROI Calculator Lead
+  // Disable button immediately
+  const btn = document.getElementById('btnRequestQuote');
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
 
-Name: ${name}
-Company: ${company}
-Email: ${email}
-Phone: ${phone || 'Not provided'}
+  // 1. Silently send lead data to Selway via Web3Forms
+  const formData = {
+    access_key: WEB3FORMS_KEY,
+    subject: `New ROI Lead: ${company || name} — ${m.brand} ${m.model}`,
+    from_name: 'Trinity ROI Calculator',
+    name: name,
+    email: email,
+    company: company,
+    phone: phone || 'Not provided',
+    machine: `${m.brand} ${m.model} (${m.type}, ${m.axes}-Axis)`,
+    trinity_system: `${t.name} — ${t.sub}`,
+    investment: fmt(r.investment),
+    shop_rate: `$${r.shopRate}/hr`,
+    manned_shifts: `${r.mannedShifts} x ${r.hrsPerShift}hr`,
+    unmanned_shifts: `${r.unmannedShifts} x ${r.hrsPerShift}hr`,
+    utilization_manned: `${(r.mannedUtilBefore*100).toFixed(0)}% → ${(r.mannedUtilAfter*100).toFixed(0)}%`,
+    utilization_unmanned: `${(r.unmannedUtilBefore*100).toFixed(0)}% → ${(r.unmannedUtilAfter*100).toFixed(0)}%`,
+    net_annual_benefit: fmt(r.netBenefit),
+    payback_period: `${r.paybackMonths.toFixed(1)} months`,
+    year1_roi: `${r.year1ROI.toFixed(0)}%`,
+    year3_roi: `${r.year3ROI.toFixed(0)}%`,
+    year5_roi: `${r.year5ROI.toFixed(0)}%`,
+    additional_revenue: `${fmt(r.totalGainRev)}/year`,
+    financing_monthly: fmt(r.finMonthly),
+    financing_hourly: fmt(r.finHourly),
+  };
 
-Machine: ${m.brand} ${m.model} (${m.type}, ${m.axes}-Axis)
-Trinity System: ${t.name} — ${t.sub}
-Investment: ${fmt(r.investment)}
+  fetch('https://api.web3forms.com/submit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(formData)
+  }).catch(() => {}); // silent — don't block the user if it fails
 
-Shop Rate: $${r.shopRate}/hr
-Manned Shifts: ${r.mannedShifts} x ${r.hrsPerShift}hr
-Unmanned Shifts: ${r.unmannedShifts} x ${r.hrsPerShift}hr
-Utilization (Manned): ${(r.mannedUtilBefore*100).toFixed(0)}% → ${(r.mannedUtilAfter*100).toFixed(0)}%
-Utilization (Unmanned): ${(r.unmannedUtilBefore*100).toFixed(0)}% → ${(r.unmannedUtilAfter*100).toFixed(0)}%
+  // 2. Generate and open the branded proposal for the customer
+  openProposal(name, company, email, phone);
 
-RESULTS:
-Net Annual Benefit: ${fmt(r.netBenefit)}
-Payback Period: ${r.paybackMonths.toFixed(1)} months
-Year 1 ROI: ${r.year1ROI.toFixed(0)}%
-Year 5 ROI: ${r.year5ROI.toFixed(0)}%
-Additional Revenue: ${fmt(r.totalGainRev)}/year
-`);
-
-  // Open mailto link
-  window.location.href = `mailto:automation@selwaytool.com?subject=${subject}&body=${body}`;
-
-  // Show success UI
+  // 3. Show success UI
   const ctaSection = document.querySelector('.cta-section');
   ctaSection.innerHTML = `
     <div class="cta-success">
       <div class="check">&#10003;</div>
-      <h3>We're on it!</h3>
-      <p>Your email app should open with your ROI details pre-filled.<br>
-      Just hit send, and a Selway automation specialist will follow up with your custom proposal.</p>
+      <h3>Your proposal is ready!</h3>
+      <p>A print dialog should open — choose <strong>"Save as PDF"</strong> to keep a copy.<br>
+      Our automation team has your details and will be in touch shortly.</p>
       <p style="margin-top:16px">Don't want to wait? Call us now: <a href="tel:8887359290" class="accent" style="font-size:18px;font-weight:600">(888) 735-9290</a></p>
     </div>
   `;
+}
+
+// ===== GENERATE BRANDED PROPOSAL =====
+function openProposal(custName, custCompany, custEmail, custPhone) {
+  const r = state.results;
+  const t = state.selectedTrinity;
+  const m = state.selectedMachine;
+  const today = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trinity Automation ROI Proposal — ${custCompany || custName}</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Outfit', sans-serif; color: #1f2937; max-width: 800px; margin: 0 auto; padding: 40px 32px; line-height: 1.5; }
+  .mono { font-family: 'DM Mono', monospace; }
+  .header { border-bottom: 3px solid #0d9488; padding-bottom: 20px; margin-bottom: 24px; }
+  .header h1 { font-size: 14px; letter-spacing: 3px; font-weight: 700; color: #0d9488; }
+  .header h2 { font-size: 28px; font-weight: 700; margin-top: 4px; }
+  .header-meta { display: flex; gap: 32px; font-size: 13px; color: #6b7280; margin-top: 10px; flex-wrap: wrap; }
+  .section { margin-bottom: 28px; }
+  .section h3 { font-size: 16px; font-weight: 700; border-bottom: 1px solid #e5e7eb; padding-bottom: 6px; margin-bottom: 12px; color: #0d9488; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .grid4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; }
+  .stat { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; }
+  .stat .label { font-size: 11px; color: #6b7280; }
+  .stat .value { font-family: 'DM Mono', monospace; font-size: 22px; font-weight: 500; color: #0d9488; }
+  .stat .sub { font-size: 11px; color: #9ca3af; }
+  .stat-highlight { background: #f0fdfa; border-color: #0d9488; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+  th { font-weight: 600; color: #6b7280; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  td.num { font-family: 'DM Mono', monospace; text-align: right; }
+  .total-row { font-weight: 700; border-top: 2px solid #0d9488; }
+  .total-row td.num { color: #0d9488; font-size: 16px; }
+  .cost-row td.num { color: #d97706; }
+  .callout { background: #f0fdfa; border: 1px solid #99f6e4; border-radius: 8px; padding: 16px; margin-top: 20px; }
+  .callout h4 { color: #0d9488; font-size: 14px; margin-bottom: 4px; }
+  .callout p { font-size: 13px; color: #6b7280; }
+  .cta { background: #0d9488; color: #fff; border-radius: 8px; padding: 24px; text-align: center; margin-top: 32px; }
+  .cta h3 { font-size: 20px; margin-bottom: 6px; }
+  .cta p { font-size: 14px; opacity: 0.9; }
+  .footer { text-align: center; font-size: 11px; color: #9ca3af; margin-top: 40px; padding-top: 16px; border-top: 1px solid #e5e7eb; }
+  .bar-row { margin-bottom: 6px; }
+  .bar-label { display: flex; justify-content: space-between; font-size: 11px; color: #6b7280; }
+  .bar-track { height: 8px; background: #e5e7eb; border-radius: 4px; }
+  .bar-fill { height: 100%; border-radius: 4px; background: #0d9488; }
+  .bar-fill.blue { background: #3b82f6; }
+  .insight { background: #f0fdfa; border: 2px solid #0d9488; border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 28px; }
+  .insight .big { font-family: 'DM Mono', monospace; font-size: 36px; color: #0d9488; font-weight: 500; }
+  .insight .hook { font-size: 15px; font-weight: 600; color: #1f2937; margin-top: 6px; }
+  @media print { body { padding: 20px; } .cta { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>SELWAY MACHINE TOOL CO.</h1>
+  <h2>Your Trinity Automation ROI Proposal</h2>
+  <div class="header-meta">
+    <span>Prepared for: <strong>${custName}</strong>${custCompany ? ' — ' + custCompany : ''}</span>
+    <span>Date: ${today}</span>
+  </div>
+</div>
+
+<div class="insight">
+  <div class="label" style="font-size:13px;color:#6b7280">Your estimated net annual benefit</div>
+  <div class="big">${fmt(r.netBenefit)}/year</div>
+  <div class="hook">Pays for itself in ${r.paybackMonths.toFixed(1)} months</div>
+</div>
+
+<div class="section">
+  <h3>Your System</h3>
+  <div class="grid2">
+    <div class="stat"><div class="label">Your CNC Machine</div><div class="value" style="font-size:18px">${m.brand} ${m.model}</div><div class="sub">${m.type} · ${m.axes}-Axis</div></div>
+    <div class="stat"><div class="label">Automation System</div><div class="value" style="font-size:18px">${t.name}</div><div class="sub">${t.sub} · ${t.pallets} pallets · ${t.weight}</div></div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Your Shop Profile</h3>
+  <div class="grid4">
+    <div class="stat"><div class="label">Shop Rate</div><div class="value" style="font-size:18px">$${r.shopRate}/hr</div></div>
+    <div class="stat"><div class="label">Manned Shifts</div><div class="value" style="font-size:18px">${r.mannedShifts}</div><div class="sub">${r.hrsPerShift} hrs each</div></div>
+    <div class="stat"><div class="label">Unmanned Shifts</div><div class="value" style="font-size:18px">${r.unmannedShifts}</div><div class="sub">${r.hrsPerShift} hrs each</div></div>
+    <div class="stat"><div class="label">Working Days</div><div class="value" style="font-size:18px">${r.workingDays}</div><div class="sub">per year</div></div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Your Return on Investment</h3>
+  <div class="grid4">
+    <div class="stat stat-highlight"><div class="label">Net Annual Benefit</div><div class="value">${fmt(r.netBenefit)}</div></div>
+    <div class="stat"><div class="label">Payback Period</div><div class="value">${r.paybackMonths.toFixed(1)}</div><div class="sub">months</div></div>
+    <div class="stat"><div class="label">Year 1 ROI</div><div class="value">${r.year1ROI.toFixed(0)}%</div></div>
+    <div class="stat"><div class="label">Year 5 ROI</div><div class="value">${r.year5ROI.toFixed(0)}%</div></div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Where the Money Comes From</h3>
+  <div class="grid2">
+    ${r.mannedShifts > 0 ? `<div class="stat">
+      <div class="label">Manned Shifts — Utilization Improvement</div>
+      <div class="bar-row"><div class="bar-label"><span>Today</span><span>${(r.mannedUtilBefore*100).toFixed(0)}%</span></div><div class="bar-track"><div class="bar-fill blue" style="width:${(r.mannedUtilBefore*100)}%"></div></div></div>
+      <div class="bar-row"><div class="bar-label"><span>With Automation</span><span>${(r.mannedUtilAfter*100).toFixed(0)}%</span></div><div class="bar-track"><div class="bar-fill blue" style="width:${(r.mannedUtilAfter*100)}%"></div></div></div>
+      <div style="margin-top:8px;font-size:12px;color:#6b7280">+${r.mannedGainHrs.toFixed(1)} hrs/day · ${fmt(r.mannedGainRev)}/yr</div>
+    </div>` : ''}
+    ${r.unmannedShifts > 0 ? `<div class="stat">
+      <div class="label">Lights-Out Shifts — NEW REVENUE</div>
+      <div class="bar-row"><div class="bar-label"><span>Today</span><span>${(r.unmannedUtilBefore*100).toFixed(0)}%</span></div><div class="bar-track"><div class="bar-fill" style="width:${Math.max(r.unmannedUtilBefore*100,1)}%"></div></div></div>
+      <div class="bar-row"><div class="bar-label"><span>With Automation</span><span>${(r.unmannedUtilAfter*100).toFixed(0)}%</span></div><div class="bar-track"><div class="bar-fill" style="width:${(r.unmannedUtilAfter*100)}%"></div></div></div>
+      <div style="margin-top:8px;font-size:12px;color:#6b7280">+${r.unmannedGainHrs.toFixed(1)} NEW hrs/day · ${fmt(r.unmannedGainRev)}/yr</div>
+    </div>` : ''}
+  </div>
+</div>
+
+<div class="section">
+  <h3>Annual Benefit Breakdown</h3>
+  <table>
+    <tr><td>Manned Shift Improvement</td><td class="num">${fmt(r.mannedGainRev)}</td></tr>
+    ${r.unmannedShifts > 0 ? `<tr><td>Unmanned Shift NEW Revenue</td><td class="num">${fmt(r.unmannedGainRev)}</td></tr>` : ''}
+    <tr><td>Labor Reallocation Value</td><td class="num">${fmt(r.laborSaving)}</td></tr>
+    <tr style="font-weight:600"><td>Gross Benefit</td><td class="num">${fmt(r.grossBenefit)}</td></tr>
+    <tr class="cost-row"><td>Less: Operating Costs (~$5/hr)</td><td class="num">-${fmt(r.opCost)}</td></tr>
+    <tr class="total-row"><td>Net Annual Benefit</td><td class="num">${fmt(r.netBenefit)}</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <h3>Financing Options</h3>
+  <div class="grid3">
+    <div class="stat"><div class="label">Monthly Payment</div><div class="value" style="font-size:18px">${fmt(r.finMonthly)}</div><div class="sub">${state.finDown}% down · ${state.finRate}% · ${state.finTerm}mo</div></div>
+    <div class="stat"><div class="label">Daily Cost</div><div class="value" style="font-size:18px">${fmt(r.finDaily)}</div></div>
+    <div class="stat stat-highlight"><div class="label">Hourly Cost</div><div class="value" style="font-size:18px">${fmt(r.finHourly)}</div><div class="sub" style="color:#0d9488;font-weight:600">You charge $${r.shopRate}/hr</div></div>
+  </div>
+  <div class="callout">
+    <h4>&#167; Section 179 Tax Deduction</h4>
+    <p>Estimated tax savings: <strong class="mono">${fmt(r.taxSavings)}</strong> (21% federal rate). Effective cost after deduction: <strong class="mono">${fmt(r.effectiveCost)}</strong>. Adjusted payback: <strong class="mono">${r.adjustedPayback.toFixed(1)} months</strong>.</p>
+  </div>
+</div>
+
+<div class="cta">
+  <h3>Ready to Automate?</h3>
+  <p>Your Selway automation specialist will be in touch shortly.</p>
+  <p style="margin-top:8px">(888) 735-9290 · automation@selwaytool.com</p>
+</div>
+
+<div class="footer">
+  SELWAY MACHINE TOOL CO. · Since 1963 · California · Oregon · Washington · Utah · Nevada · (888) 735-9290 · selwaytool.com
+</div>
+
+<script>window.onload = function() { setTimeout(function() { window.print(); }, 500); };<\/script>
+</body>
+</html>`;
+
+  const proposalWindow = window.open('', '_blank');
+  proposalWindow.document.write(html);
+  proposalWindow.document.close();
 }
