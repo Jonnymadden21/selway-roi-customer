@@ -553,56 +553,42 @@ function handleQuoteRequest() {
   btn.textContent = 'Sending...';
 
   // 1. Silently send lead data + proposal summary to Selway via Web3Forms
-  const proposalHtml = `
-<h2>Trinity Automation ROI Proposal</h2>
-<hr>
-<h3>Customer Information</h3>
-<table border="0" cellpadding="4">
-<tr><td><b>Name:</b></td><td>${name}</td></tr>
-<tr><td><b>Company:</b></td><td>${company || 'Not provided'}</td></tr>
-<tr><td><b>Email:</b></td><td>${email}</td></tr>
-<tr><td><b>Phone:</b></td><td>${phone || 'Not provided'}</td></tr>
-</table>
-
-<h3>Equipment</h3>
-<table border="0" cellpadding="4">
-<tr><td><b>Machine:</b></td><td>${m.brand} ${m.model} (${m.type}, ${m.axes}-Axis)</td></tr>
-<tr><td><b>Trinity System:</b></td><td>${t.name} — ${t.sub}</td></tr>
-<tr><td><b>Investment:</b></td><td>${fmt(r.investment)}</td></tr>
-</table>
-
-<h3>Shop Configuration</h3>
-<table border="0" cellpadding="4">
-<tr><td><b>Shop Rate:</b></td><td>$${r.shopRate}/hr</td></tr>
-<tr><td><b>Manned Shifts:</b></td><td>${r.mannedShifts} x ${r.hrsPerShift}hr</td></tr>
-<tr><td><b>Unmanned Shifts:</b></td><td>${r.unmannedShifts} x ${r.hrsPerShift}hr</td></tr>
-<tr><td><b>Manned Utilization:</b></td><td>${(r.mannedUtilBefore*100).toFixed(0)}% → ${(r.mannedUtilAfter*100).toFixed(0)}%</td></tr>
-<tr><td><b>Unmanned Utilization:</b></td><td>${(r.unmannedUtilBefore*100).toFixed(0)}% → ${(r.unmannedUtilAfter*100).toFixed(0)}%</td></tr>
-</table>
-
-<h3>ROI Results</h3>
-<table border="0" cellpadding="4">
-<tr><td><b>Additional Revenue:</b></td><td>${fmt(r.totalGainRev)}/year</td></tr>
-<tr><td><b>Net Annual Benefit:</b></td><td>${fmt(r.netBenefit)}</td></tr>
-<tr><td><b>Payback Period:</b></td><td>${r.paybackMonths.toFixed(1)} months</td></tr>
-<tr><td><b>Year 1 ROI:</b></td><td>${r.year1ROI.toFixed(0)}%</td></tr>
-<tr><td><b>Year 3 ROI:</b></td><td>${r.year3ROI.toFixed(0)}%</td></tr>
-<tr><td><b>Year 5 ROI:</b></td><td>${r.year5ROI.toFixed(0)}%</td></tr>
-</table>
-
-<h3>Financing</h3>
-<table border="0" cellpadding="4">
-<tr><td><b>Monthly Payment:</b></td><td>${fmt(r.finMonthly)}</td></tr>
-<tr><td><b>Hourly Cost:</b></td><td>${fmt(r.finHourly)}</td></tr>
-</table>
-`;
-
+  // 1. Silently send lead + proposal summary to Selway via Web3Forms
   const formData = {
     access_key: WEB3FORMS_KEY,
     subject: `Trinity ROI Proposal — ${company || name} — ${m.brand} ${m.model}`,
     from_name: 'Trinity ROI Calculator',
     replyto: email,
-    message: proposalHtml,
+
+    // Customer Info
+    'Customer Name': name,
+    'Company': company || 'Not provided',
+    'Email': email,
+    'Phone': phone || 'Not provided',
+
+    // Equipment
+    'Machine': `${m.brand} ${m.model} (${m.type}, ${m.axes}-Axis)`,
+    'Trinity System': `${t.name} — ${t.sub}`,
+    'Investment': fmt(r.investment),
+
+    // Shop Configuration
+    'Shop Rate': `$${r.shopRate}/hr`,
+    'Manned Shifts': `${r.mannedShifts} x ${r.hrsPerShift}hr`,
+    'Unmanned Shifts': `${r.unmannedShifts} x ${r.hrsPerShift}hr`,
+    'Manned Utilization': `${(r.mannedUtilBefore*100).toFixed(0)}% → ${(r.mannedUtilAfter*100).toFixed(0)}%`,
+    'Unmanned Utilization': `${(r.unmannedUtilBefore*100).toFixed(0)}% → ${(r.unmannedUtilAfter*100).toFixed(0)}%`,
+
+    // ROI Results
+    'Additional Revenue': `${fmt(r.totalGainRev)}/year`,
+    'Net Annual Benefit': fmt(r.netBenefit),
+    'Payback Period': `${r.paybackMonths.toFixed(1)} months`,
+    'Year 1 ROI': `${r.year1ROI.toFixed(0)}%`,
+    'Year 3 ROI': `${r.year3ROI.toFixed(0)}%`,
+    'Year 5 ROI': `${r.year5ROI.toFixed(0)}%`,
+
+    // Financing
+    'Monthly Payment': fmt(r.finMonthly),
+    'Hourly Cost': fmt(r.finHourly),
   };
 
   fetch('https://api.web3forms.com/submit', {
