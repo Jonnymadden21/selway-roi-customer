@@ -528,8 +528,7 @@ function renderFinancing() {
 }
 
 // ===== WEB3FORMS API KEY =====
-// Get your free key at https://web3forms.com — enter jonnymadden21@cloud.com
-// Replace the key below with your actual key
+// Web3Forms account — sends to trinity.selway@gmail.com
 const WEB3FORMS_KEY = '8d009d47-79bd-4615-be0b-bcc34bb66a50';
 
 // ===== QUOTE REQUEST =====
@@ -553,31 +552,57 @@ function handleQuoteRequest() {
   btn.disabled = true;
   btn.textContent = 'Sending...';
 
-  // 1. Silently send lead data to Selway via Web3Forms
+  // 1. Silently send lead data + proposal summary to Selway via Web3Forms
+  const proposalHtml = `
+<h2>Trinity Automation ROI Proposal</h2>
+<hr>
+<h3>Customer Information</h3>
+<table border="0" cellpadding="4">
+<tr><td><b>Name:</b></td><td>${name}</td></tr>
+<tr><td><b>Company:</b></td><td>${company || 'Not provided'}</td></tr>
+<tr><td><b>Email:</b></td><td>${email}</td></tr>
+<tr><td><b>Phone:</b></td><td>${phone || 'Not provided'}</td></tr>
+</table>
+
+<h3>Equipment</h3>
+<table border="0" cellpadding="4">
+<tr><td><b>Machine:</b></td><td>${m.brand} ${m.model} (${m.type}, ${m.axes}-Axis)</td></tr>
+<tr><td><b>Trinity System:</b></td><td>${t.name} — ${t.sub}</td></tr>
+<tr><td><b>Investment:</b></td><td>${fmt(r.investment)}</td></tr>
+</table>
+
+<h3>Shop Configuration</h3>
+<table border="0" cellpadding="4">
+<tr><td><b>Shop Rate:</b></td><td>$${r.shopRate}/hr</td></tr>
+<tr><td><b>Manned Shifts:</b></td><td>${r.mannedShifts} x ${r.hrsPerShift}hr</td></tr>
+<tr><td><b>Unmanned Shifts:</b></td><td>${r.unmannedShifts} x ${r.hrsPerShift}hr</td></tr>
+<tr><td><b>Manned Utilization:</b></td><td>${(r.mannedUtilBefore*100).toFixed(0)}% → ${(r.mannedUtilAfter*100).toFixed(0)}%</td></tr>
+<tr><td><b>Unmanned Utilization:</b></td><td>${(r.unmannedUtilBefore*100).toFixed(0)}% → ${(r.unmannedUtilAfter*100).toFixed(0)}%</td></tr>
+</table>
+
+<h3>ROI Results</h3>
+<table border="0" cellpadding="4">
+<tr><td><b>Additional Revenue:</b></td><td>${fmt(r.totalGainRev)}/year</td></tr>
+<tr><td><b>Net Annual Benefit:</b></td><td>${fmt(r.netBenefit)}</td></tr>
+<tr><td><b>Payback Period:</b></td><td>${r.paybackMonths.toFixed(1)} months</td></tr>
+<tr><td><b>Year 1 ROI:</b></td><td>${r.year1ROI.toFixed(0)}%</td></tr>
+<tr><td><b>Year 3 ROI:</b></td><td>${r.year3ROI.toFixed(0)}%</td></tr>
+<tr><td><b>Year 5 ROI:</b></td><td>${r.year5ROI.toFixed(0)}%</td></tr>
+</table>
+
+<h3>Financing</h3>
+<table border="0" cellpadding="4">
+<tr><td><b>Monthly Payment:</b></td><td>${fmt(r.finMonthly)}</td></tr>
+<tr><td><b>Hourly Cost:</b></td><td>${fmt(r.finHourly)}</td></tr>
+</table>
+`;
+
   const formData = {
     access_key: WEB3FORMS_KEY,
-    subject: `New ROI Lead: ${company || name} — ${m.brand} ${m.model}`,
+    subject: `Trinity ROI Proposal — ${company || name} — ${m.brand} ${m.model}`,
     from_name: 'Trinity ROI Calculator',
-    name: name,
-    email: email,
-    company: company,
-    phone: phone || 'Not provided',
-    machine: `${m.brand} ${m.model} (${m.type}, ${m.axes}-Axis)`,
-    trinity_system: `${t.name} — ${t.sub}`,
-    investment: fmt(r.investment),
-    shop_rate: `$${r.shopRate}/hr`,
-    manned_shifts: `${r.mannedShifts} x ${r.hrsPerShift}hr`,
-    unmanned_shifts: `${r.unmannedShifts} x ${r.hrsPerShift}hr`,
-    utilization_manned: `${(r.mannedUtilBefore*100).toFixed(0)}% → ${(r.mannedUtilAfter*100).toFixed(0)}%`,
-    utilization_unmanned: `${(r.unmannedUtilBefore*100).toFixed(0)}% → ${(r.unmannedUtilAfter*100).toFixed(0)}%`,
-    net_annual_benefit: fmt(r.netBenefit),
-    payback_period: `${r.paybackMonths.toFixed(1)} months`,
-    year1_roi: `${r.year1ROI.toFixed(0)}%`,
-    year3_roi: `${r.year3ROI.toFixed(0)}%`,
-    year5_roi: `${r.year5ROI.toFixed(0)}%`,
-    additional_revenue: `${fmt(r.totalGainRev)}/year`,
-    financing_monthly: fmt(r.finMonthly),
-    financing_hourly: fmt(r.finHourly),
+    replyto: email,
+    message: proposalHtml,
   };
 
   fetch('https://api.web3forms.com/submit', {
