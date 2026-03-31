@@ -1,6 +1,6 @@
 // ============================================================
 // TRINITY ROI CALCULATOR — Customer-Facing Version
-// Selway Machine Tool Co.
+// Trinity Automation (trinityautomation.com)
 // ============================================================
 
 // ===== MACHINE DATA =====
@@ -528,7 +528,7 @@ function renderFinancing() {
 }
 
 // ===== WEB3FORMS API KEY =====
-// Web3Forms account — sends to trinity.selway@gmail.com
+// Web3Forms account — sends to Trinity Automation sales team
 const WEB3FORMS_KEY = '8d009d47-79bd-4615-be0b-bcc34bb66a50';
 
 // ===== QUOTE REQUEST =====
@@ -552,8 +552,7 @@ function handleQuoteRequest() {
   btn.disabled = true;
   btn.textContent = 'Sending...';
 
-  // 1. Silently send lead data + proposal summary to Selway via Web3Forms
-  // 1. Silently send lead + proposal summary to Selway via Web3Forms
+  // 1. Silently send lead + proposal summary to Trinity Automation via Web3Forms
   const formData = {
     access_key: WEB3FORMS_KEY,
     subject: `Trinity ROI Proposal — ${company || name} — ${m.brand} ${m.model}`,
@@ -608,7 +607,7 @@ function handleQuoteRequest() {
       <h3>Your proposal is ready!</h3>
       <p>A print dialog should open — choose <strong>"Save as PDF"</strong> to keep a copy.<br>
       Our automation team has your details and will be in touch shortly.</p>
-      <p style="margin-top:16px">Don't want to wait? Call us now: <a href="tel:8887359290" class="accent" style="font-size:18px;font-weight:600">(888) 735-9290</a></p>
+      <p style="margin-top:16px">Don't want to wait? Call us now: <a href="tel:8007626864" class="accent" style="font-size:18px;font-weight:600">(800) 762-6864</a></p>
     </div>
   `;
 }
@@ -630,48 +629,48 @@ function openProposal(custName, custCompany, custEmail, custPhone) {
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Outfit', sans-serif; color: #1f2937; max-width: 800px; margin: 0 auto; padding: 40px 32px; line-height: 1.5; }
   .mono { font-family: 'DM Mono', monospace; }
-  .header { border-bottom: 3px solid #0d9488; padding-bottom: 20px; margin-bottom: 24px; }
-  .header h1 { font-size: 14px; letter-spacing: 3px; font-weight: 700; color: #0d9488; }
+  .header { border-bottom: 3px solid #008C9A; padding-bottom: 20px; margin-bottom: 24px; }
+  .header h1 { font-size: 14px; letter-spacing: 3px; font-weight: 700; color: #008C9A; }
   .header h2 { font-size: 28px; font-weight: 700; margin-top: 4px; }
   .header-meta { display: flex; gap: 32px; font-size: 13px; color: #6b7280; margin-top: 10px; flex-wrap: wrap; }
   .section { margin-bottom: 28px; }
-  .section h3 { font-size: 16px; font-weight: 700; border-bottom: 1px solid #e5e7eb; padding-bottom: 6px; margin-bottom: 12px; color: #0d9488; }
+  .section h3 { font-size: 16px; font-weight: 700; border-bottom: 1px solid #e5e7eb; padding-bottom: 6px; margin-bottom: 12px; color: #008C9A; }
   .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
   .grid4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; }
   .stat { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; }
   .stat .label { font-size: 11px; color: #6b7280; }
-  .stat .value { font-family: 'DM Mono', monospace; font-size: 22px; font-weight: 500; color: #0d9488; }
+  .stat .value { font-family: 'DM Mono', monospace; font-size: 22px; font-weight: 500; color: #008C9A; }
   .stat .sub { font-size: 11px; color: #9ca3af; }
-  .stat-highlight { background: #f0fdfa; border-color: #0d9488; }
+  .stat-highlight { background: #f0fdfa; border-color: #008C9A; }
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
   th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
   th { font-weight: 600; color: #6b7280; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
   td.num { font-family: 'DM Mono', monospace; text-align: right; }
-  .total-row { font-weight: 700; border-top: 2px solid #0d9488; }
-  .total-row td.num { color: #0d9488; font-size: 16px; }
+  .total-row { font-weight: 700; border-top: 2px solid #008C9A; }
+  .total-row td.num { color: #008C9A; font-size: 16px; }
   .cost-row td.num { color: #d97706; }
   .callout { background: #f0fdfa; border: 1px solid #99f6e4; border-radius: 8px; padding: 16px; margin-top: 20px; }
-  .callout h4 { color: #0d9488; font-size: 14px; margin-bottom: 4px; }
+  .callout h4 { color: #008C9A; font-size: 14px; margin-bottom: 4px; }
   .callout p { font-size: 13px; color: #6b7280; }
-  .cta { background: #0d9488; color: #fff; border-radius: 8px; padding: 24px; text-align: center; margin-top: 32px; }
+  .cta { background: #008C9A; color: #fff; border-radius: 8px; padding: 24px; text-align: center; margin-top: 32px; }
   .cta h3 { font-size: 20px; margin-bottom: 6px; }
   .cta p { font-size: 14px; opacity: 0.9; }
   .footer { text-align: center; font-size: 11px; color: #9ca3af; margin-top: 40px; padding-top: 16px; border-top: 1px solid #e5e7eb; }
   .bar-row { margin-bottom: 6px; }
   .bar-label { display: flex; justify-content: space-between; font-size: 11px; color: #6b7280; }
   .bar-track { height: 8px; background: #e5e7eb; border-radius: 4px; }
-  .bar-fill { height: 100%; border-radius: 4px; background: #0d9488; }
+  .bar-fill { height: 100%; border-radius: 4px; background: #008C9A; }
   .bar-fill.blue { background: #3b82f6; }
-  .insight { background: #f0fdfa; border: 2px solid #0d9488; border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 28px; }
-  .insight .big { font-family: 'DM Mono', monospace; font-size: 36px; color: #0d9488; font-weight: 500; }
+  .insight { background: #f0fdfa; border: 2px solid #008C9A; border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 28px; }
+  .insight .big { font-family: 'DM Mono', monospace; font-size: 36px; color: #008C9A; font-weight: 500; }
   .insight .hook { font-size: 15px; font-weight: 600; color: #1f2937; margin-top: 6px; }
   @media print { body { padding: 20px; } .cta { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
 </style>
 </head>
 <body>
 <div class="header">
-  <h1>SELWAY MACHINE TOOL CO.</h1>
+  <h1>TRINITY AUTOMATION</h1>
   <h2>Your Trinity Automation ROI Proposal</h2>
   <div class="header-meta">
     <span>Prepared for: <strong>${custName}</strong>${custCompany ? ' — ' + custCompany : ''}</span>
@@ -748,7 +747,7 @@ function openProposal(custName, custCompany, custEmail, custPhone) {
   <div class="grid3">
     <div class="stat"><div class="label">Monthly Payment</div><div class="value" style="font-size:18px">${fmt(r.finMonthly)}</div><div class="sub">${state.finDown}% down · ${state.finRate}% · ${state.finTerm}mo</div></div>
     <div class="stat"><div class="label">Daily Cost</div><div class="value" style="font-size:18px">${fmt(r.finDaily)}</div></div>
-    <div class="stat stat-highlight"><div class="label">Hourly Cost</div><div class="value" style="font-size:18px">${fmt(r.finHourly)}</div><div class="sub" style="color:#0d9488;font-weight:600">You charge $${r.shopRate}/hr</div></div>
+    <div class="stat stat-highlight"><div class="label">Hourly Cost</div><div class="value" style="font-size:18px">${fmt(r.finHourly)}</div><div class="sub" style="color:#008C9A;font-weight:600">You charge $${r.shopRate}/hr</div></div>
   </div>
   <div class="callout">
     <h4>&#167; Section 179 Tax Deduction</h4>
@@ -758,12 +757,12 @@ function openProposal(custName, custCompany, custEmail, custPhone) {
 
 <div class="cta">
   <h3>Ready to Automate?</h3>
-  <p>Your Selway automation specialist will be in touch shortly.</p>
-  <p style="margin-top:8px">(888) 735-9290 · automation@selwaytool.com</p>
+  <p>Your Trinity Automation specialist will be in touch shortly.</p>
+  <p style="margin-top:8px">(800) 762-6864 · sales@trinityautomation.com</p>
 </div>
 
 <div class="footer">
-  SELWAY MACHINE TOOL CO. · Since 1963 · California · Oregon · Washington · Utah · Nevada · (888) 735-9290 · selwaytool.com
+  TRINITY AUTOMATION · Since 2004 · Northern CA: 431 Nelo Street, Santa Clara, CA 95054 · Southern CA: 4582 E Brickell Privado, Ontario, CA 91761 · (800) 762-6864 · trinityautomation.com
 </div>
 
 <script>window.onload = function() { setTimeout(function() { window.print(); }, 500); };<\/script>
