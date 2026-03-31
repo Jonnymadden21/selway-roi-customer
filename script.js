@@ -46,6 +46,11 @@ const MACHINES = [
   { id:'nxv', model:'NXV1020A', brand:'YCM', type:'VMC', axes:3, compat:['AI1','AX2'], rec:'AX2' },
   { id:'robo', model:'Robodrill', brand:'Fanuc', type:'VMC', axes:3, compat:['AI1','AX1'], rec:'AX1' },
   { id:'s700', model:'Speedio S700', brand:'Brother', type:'VMC', axes:3, compat:['AI1','AX1'], rec:'AX1' },
+  // GENERIC SIZE OPTIONS (for machines not listed)
+  { id:'gen_sm', model:'Small CNC', brand:'Other', type:'VMC', axes:3, compat:['AI1','AX1'], rec:'AX1', generic:true, desc:'Max part: 12" x 9" H · Max weight: 35 lbs' },
+  { id:'gen_md', model:'Medium CNC', brand:'Other', type:'VMC', axes:3, compat:['AI1','AX2','AX2D'], rec:'AX2', generic:true, desc:'Max part: 16" x 9" H · Max weight: 55 lbs' },
+  { id:'gen_lg', model:'Large CNC', brand:'Other', type:'VMC', axes:3, compat:['AI1','AX5','AX5H','AX2D'], rec:'AX5', generic:true, desc:'Max part: 20" x 12" H · Max weight: 75 lbs' },
+  { id:'gen_xl', model:'Extra Large CNC', brand:'Other', type:'VMC', axes:3, compat:['AI1','AX5H'], rec:'AX5H', generic:true, desc:'Max part: 20"+ x 12"+ H · Max weight: 180 lbs' },
 ];
 
 // ===== TRINITY MODEL DATA =====
@@ -109,13 +114,15 @@ function renderMachineGrid() {
       m.type.toLowerCase().includes(search);
     return matchBrand && matchSearch;
   });
-  grid.innerHTML = filtered.map(m => `
-    <div class="machine-card${state.selectedMachine?.id === m.id ? ' selected' : ''}" data-id="${m.id}">
-      <div class="machine-brand">${m.brand}</div>
-      <div class="machine-model">${m.model}</div>
-      <div class="machine-meta"><span>${m.type}</span><span>${m.axes}-Axis</span></div>
-    </div>
-  `).join('');
+  // machine data is hardcoded constants — safe for innerHTML
+  grid.innerHTML = filtered.map(m => [
+    `<div class="machine-card${state.selectedMachine?.id === m.id ? ' selected' : ''}${m.generic ? ' generic' : ''}" data-id="${m.id}">`,
+    `<div class="machine-brand">${m.brand}</div>`,
+    `<div class="machine-model">${m.model}</div>`,
+    `<div class="machine-meta"><span>${m.type}</span><span>${m.axes}-Axis</span></div>`,
+    m.generic ? `<div class="machine-desc">${m.desc}</div><div class="generic-warning">Prices may vary — contact us for exact quote</div>` : '',
+    '</div>'
+  ].join('')).join('');
   grid.querySelectorAll('.machine-card').forEach(card => {
     card.addEventListener('click', () => {
       state.selectedMachine = MACHINES.find(m => m.id === card.dataset.id);
@@ -627,54 +634,59 @@ function openProposal(custName, custCompany, custEmail, custPhone) {
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Outfit', sans-serif; color: #1f2937; max-width: 800px; margin: 0 auto; padding: 40px 32px; line-height: 1.5; }
+  body { font-family: 'Outfit', sans-serif; color: #1A1A1A; background: #FFFFFF; max-width: 800px; margin: 0 auto; padding: 40px 32px; line-height: 1.5; }
   .mono { font-family: 'DM Mono', monospace; }
-  .header { border-bottom: 3px solid #008C9A; padding-bottom: 20px; margin-bottom: 24px; }
-  .header h1 { font-size: 14px; letter-spacing: 3px; font-weight: 700; color: #008C9A; }
-  .header h2 { font-size: 28px; font-weight: 700; margin-top: 4px; }
-  .header-meta { display: flex; gap: 32px; font-size: 13px; color: #6b7280; margin-top: 10px; flex-wrap: wrap; }
+  .accent { color: #1A1A1A; font-weight: 700; }
+  .header { border-bottom: 3px solid #D4A843; padding-bottom: 20px; margin-bottom: 24px; display: flex; align-items: flex-start; gap: 16px; }
+  .header-logo { width: 44px; height: 44px; border-radius: 8px; background: #D4A843; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; letter-spacing: 1px; flex-shrink: 0; margin-top: 4px; }
+  .header-text h1 { font-size: 14px; letter-spacing: 3px; font-weight: 700; color: #1A1A1A; }
+  .header-text h2 { font-size: 28px; font-weight: 700; margin-top: 4px; color: #1A1A1A; }
+  .header-meta { display: flex; gap: 32px; font-size: 13px; color: #333333; margin-top: 10px; flex-wrap: wrap; }
   .section { margin-bottom: 28px; }
-  .section h3 { font-size: 16px; font-weight: 700; border-bottom: 1px solid #e5e7eb; padding-bottom: 6px; margin-bottom: 12px; color: #008C9A; }
+  .section h3 { font-size: 16px; font-weight: 700; border-bottom: 1px solid #E0E0E0; padding-bottom: 6px; margin-bottom: 12px; color: #1A1A1A; }
   .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
   .grid4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; }
-  .stat { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; }
-  .stat .label { font-size: 11px; color: #6b7280; }
-  .stat .value { font-family: 'DM Mono', monospace; font-size: 22px; font-weight: 500; color: #008C9A; }
-  .stat .sub { font-size: 11px; color: #9ca3af; }
-  .stat-highlight { background: #f0fdfa; border-color: #008C9A; }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
-  th { font-weight: 600; color: #6b7280; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
-  td.num { font-family: 'DM Mono', monospace; text-align: right; }
-  .total-row { font-weight: 700; border-top: 2px solid #008C9A; }
-  .total-row td.num { color: #008C9A; font-size: 16px; }
-  .cost-row td.num { color: #d97706; }
-  .callout { background: #f0fdfa; border: 1px solid #99f6e4; border-radius: 8px; padding: 16px; margin-top: 20px; }
-  .callout h4 { color: #008C9A; font-size: 14px; margin-bottom: 4px; }
-  .callout p { font-size: 13px; color: #6b7280; }
-  .cta { background: #008C9A; color: #fff; border-radius: 8px; padding: 24px; text-align: center; margin-top: 32px; }
-  .cta h3 { font-size: 20px; margin-bottom: 6px; }
-  .cta p { font-size: 14px; opacity: 0.9; }
-  .footer { text-align: center; font-size: 11px; color: #9ca3af; margin-top: 40px; padding-top: 16px; border-top: 1px solid #e5e7eb; }
+  .stat { background: #F9F9F9; border: 1px solid #E0E0E0; border-radius: 8px; padding: 14px; }
+  .stat .label { font-size: 11px; color: #333333; }
+  .stat .value { font-family: 'DM Mono', monospace; font-size: 22px; font-weight: 600; color: #1A1A1A; }
+  .stat .sub { font-size: 11px; color: #555555; }
+  .stat-highlight { background: rgba(212,168,67,0.08); border-color: #D4A843; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; color: #1A1A1A; }
+  th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #E0E0E0; }
+  th { font-weight: 600; color: #333333; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  td.num { font-family: 'DM Mono', monospace; text-align: right; color: #1A1A1A; }
+  .total-row { font-weight: 700; border-top: 2px solid #D4A843; }
+  .total-row td.num { color: #1A1A1A; font-size: 16px; font-weight: 700; }
+  .cost-row td.num { color: #1A1A1A; }
+  .callout { background: rgba(212,168,67,0.07); border: 1px solid rgba(212,168,67,0.25); border-radius: 8px; padding: 16px; margin-top: 20px; }
+  .callout h4 { color: #1A1A1A; font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .callout p { font-size: 13px; color: #333333; }
+  .cta { background: #D4A843; color: #1A1A1A; border-radius: 8px; padding: 24px; text-align: center; margin-top: 32px; }
+  .cta h3 { font-size: 20px; margin-bottom: 6px; font-weight: 700; }
+  .cta p { font-size: 14px; opacity: 0.85; }
+  .footer { text-align: center; font-size: 11px; color: #333333; margin-top: 40px; padding-top: 16px; border-top: 1px solid #E0E0E0; }
   .bar-row { margin-bottom: 6px; }
-  .bar-label { display: flex; justify-content: space-between; font-size: 11px; color: #6b7280; }
-  .bar-track { height: 8px; background: #e5e7eb; border-radius: 4px; }
-  .bar-fill { height: 100%; border-radius: 4px; background: #008C9A; }
-  .bar-fill.blue { background: #3b82f6; }
-  .insight { background: #f0fdfa; border: 2px solid #008C9A; border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 28px; }
-  .insight .big { font-family: 'DM Mono', monospace; font-size: 36px; color: #008C9A; font-weight: 500; }
-  .insight .hook { font-size: 15px; font-weight: 600; color: #1f2937; margin-top: 6px; }
+  .bar-label { display: flex; justify-content: space-between; font-size: 11px; color: #333333; }
+  .bar-track { height: 8px; background: #E0E0E0; border-radius: 4px; }
+  .bar-fill { height: 100%; border-radius: 4px; background: #D4A843; }
+  .bar-fill.blue { background: #1565C0; }
+  .insight { background: rgba(212,168,67,0.07); border: 2px solid #D4A843; border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 28px; }
+  .insight .big { font-family: 'DM Mono', monospace; font-size: 36px; color: #1A1A1A; font-weight: 500; }
+  .insight .hook { font-size: 15px; font-weight: 600; color: #1A1A1A; margin-top: 6px; }
   @media print { body { padding: 20px; } .cta { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
 </style>
 </head>
 <body>
 <div class="header">
-  <h1>TRINITY AUTOMATION</h1>
-  <h2>Your Trinity Automation ROI Proposal</h2>
-  <div class="header-meta">
-    <span>Prepared for: <strong>${custName}</strong>${custCompany ? ' — ' + custCompany : ''}</span>
-    <span>Date: ${today}</span>
+  <div class="header-logo">TRA</div>
+  <div class="header-text">
+    <h1>TRINITY AUTOMATION</h1>
+    <h2>Your Trinity Automation ROI Proposal</h2>
+    <div class="header-meta">
+      <span>Prepared for: <strong>${custName}</strong>${custCompany ? ' — ' + custCompany : ''}</span>
+      <span>Date: ${today}</span>
+    </div>
   </div>
 </div>
 
@@ -747,7 +759,7 @@ function openProposal(custName, custCompany, custEmail, custPhone) {
   <div class="grid3">
     <div class="stat"><div class="label">Monthly Payment</div><div class="value" style="font-size:18px">${fmt(r.finMonthly)}</div><div class="sub">${state.finDown}% down · ${state.finRate}% · ${state.finTerm}mo</div></div>
     <div class="stat"><div class="label">Daily Cost</div><div class="value" style="font-size:18px">${fmt(r.finDaily)}</div></div>
-    <div class="stat stat-highlight"><div class="label">Hourly Cost</div><div class="value" style="font-size:18px">${fmt(r.finHourly)}</div><div class="sub" style="color:#008C9A;font-weight:600">You charge $${r.shopRate}/hr</div></div>
+    <div class="stat stat-highlight"><div class="label">Hourly Cost</div><div class="value" style="font-size:18px">${fmt(r.finHourly)}</div><div class="sub" style="color:#1A1A1A;font-weight:600">You charge $${r.shopRate}/hr</div></div>
   </div>
   <div class="callout">
     <h4>&#167; Section 179 Tax Deduction</h4>
@@ -762,7 +774,7 @@ function openProposal(custName, custCompany, custEmail, custPhone) {
 </div>
 
 <div class="footer">
-  TRINITY AUTOMATION · Since 2004 · Northern CA: 431 Nelo Street, Santa Clara, CA 95054 · Southern CA: 4582 E Brickell Privado, Ontario, CA 91761 · (800) 762-6864 · trinityautomation.com
+  TRINITY AUTOMATION · Since 2004 · 431 Nelo Street, Santa Clara, CA 95054 · 800-762-6864 · trinityautomation.com
 </div>
 
 <script>window.onload = function() { setTimeout(function() { window.print(); }, 500); };<\/script>
