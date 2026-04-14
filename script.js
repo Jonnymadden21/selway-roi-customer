@@ -565,8 +565,9 @@ function renderFinancing() {
 }
 
 // ===== WEB3FORMS API KEY =====
-// Web3Forms account — sends to Trinity Automation sales team
-const WEB3FORMS_KEY = '8d009d47-79bd-4615-be0b-bcc34bb66a50';
+// Web3Forms account registered to jonmadden@selwaytool.com — customer leads
+// land in the Selway work inbox.
+const WEB3FORMS_KEY = 'b00ba4eb-0735-408c-bc0f-192d4c094285';
 
 // ===== QUOTE REQUEST =====
 function handleQuoteRequest() {
